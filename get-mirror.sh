@@ -3,14 +3,13 @@
 set -e
 
 #
-# build-mirror.sh - 更新离线安装包
+# get-mirror.sh - 更新离线安装包
 #
 # 选项:
-#   --force   强制更新 costrict-static 内容（即使本地已存在）
+#   --force   强制更新 costrict-static.tar 内容（即使本地已存在）
 #
 
 BASE_URL="https://zgsm.sangfor.com"
-MANIFEST_FILE="./MANIFEST"
 
 # 显示帮助信息
 show_help() {
@@ -19,15 +18,15 @@ show_help() {
     echo "从 $BASE_URL 拉取静态安装包"
     echo ""
     echo "选项:"
-    echo "  --force   强制更新 costrict-static 内容（即使本地已存在）"
+    echo "  --force   强制更新 costrict-static.tar（即使本地已存在）"
     echo "  --help, -h        显示此帮助信息"
     echo ""
     echo "执行步骤:"
-    echo "  获取/更新 costrict-static 的内容（从 ${BASE_URL} 下载 MANIFEST 及其列出的文件）"
+    echo "  获取/更新 costrict-static.tar（从 ${BASE_URL}/costrict-static/costrict-static.tar下载）"
     echo ""
     echo "示例:"
-    echo "  $0                              # 仅打包（不构建，不忽略 images，已有静态文件不更新）"
-    echo "  $0 --force              # 强制更新静态文件后打包"
+    echo "  $0                 # 本地不存在就获取"
+    echo "  $0 --force         # 强制更新"
     echo ""
 }
 
@@ -52,16 +51,7 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-#
-# 获取/更新 costrict-static 的内容
-#
-echo "----------------------------------------------------------------"
-echo " 获取/更新 ${STATIC_DIR} 内容..."
-echo "----------------------------------------------------------------"
-
 # 下载单个文件
-# file_path 是./costrict-static目录下的文件或子目录（如 ./linux/amd64/xxx）
-#
 download_file() {
     local file_path="$1"
 
@@ -115,26 +105,13 @@ download_file() {
     fi
 }
 
-# 执行 MANIFEST 下载
-download_file "./MANIFEST"
+echo "----------------------------------------------------------------"
+echo " 获取/更新 costrict-static.tar ..."
+echo "----------------------------------------------------------------"
 
-# 读取 MANIFEST 并逐文件下载
-if [ -f "${MANIFEST_FILE}" ]; then
-    echo ""
-    echo "正在根据 MANIFEST 下载文件..."
-    while IFS= read -r file_path || [ -n "$file_path" ]; do
-        # 跳过空行和注释行（以 # 开头）
-        [[ -z "${file_path}" ]] && continue
-        [[ "${file_path}" =~ ^[[:space:]]*# ]] && continue
-
-        download_file "${file_path}"
-    done < "${MANIFEST_FILE}"
-    echo "MANIFEST 中列出的文件处理完成。"
-else
-    echo "警告: MANIFEST 文件不存在，跳过文件下载。"
-fi
+download_file "./costrict-static.tar"
 
 echo ""
 echo "----------------------------------------------------------------"
-echo "离线安装包更新完成"
+echo "costrict-static.tar更新完成"
 echo "----------------------------------------------------------------"

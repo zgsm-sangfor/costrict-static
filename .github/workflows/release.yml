@@ -18,14 +18,12 @@ jobs:
 
     - name: Prepare static files
       run: |
-        echo "Running get-mirror.sh to update static files..."
+        echo "Running get-mirror.sh to get costrict-static.tar files..."
         chmod +x ./get-mirror.sh
         ./get-mirror.sh --force
         echo ""
-        echo "Creating costrict-static.tar..."
         mkdir -p release-assets
-        grep -v '^[[:space:]]*$' MANIFEST | sed 's|^\./||' | tar -cvf release-assets/costrict-static.tar -T -
-        echo "costrict-static.tar created:"
+        mv costrict-static.tar release-assets/
         ls -lh release-assets/costrict-static.tar
 
     - name: Create Release and Upload Assets
@@ -37,7 +35,7 @@ jobs:
           Costrict Static ${{ github.ref_name }}
 
           ## 内容
-          - `costrict-static.tar`: 离线静态文件包（docker、docker-compose、jq 等）
+          - `costrict-static.tar`: 离线静态文件包（docker、docker-compose、jq、nginx 等）
         files: release-assets/*
         draft: false
         prerelease: false
