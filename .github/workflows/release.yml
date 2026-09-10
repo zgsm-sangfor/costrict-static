@@ -20,11 +20,14 @@ jobs:
       run: |
         echo "Running get-mirror.sh to get costrict-static.tar files..."
         chmod +x ./get-mirror.sh
+        chmod +x ./get-nginx.sh
         ./get-mirror.sh --force
+        ./get-nginx.sh
         echo ""
         mkdir -p release-assets
         mv costrict-static.tar release-assets/
-        ls -lh release-assets/costrict-static.tar
+        mv nginx-1.31.1.tar release-assets/
+        ls -lh release-assets/*
 
     - name: Create Release and Upload Assets
       uses: softprops/action-gh-release@v2
